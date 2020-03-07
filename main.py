@@ -2,22 +2,36 @@
 
 
 """
-fichier principal pour la detection des inclusions.
-ce fichier est utilise pour les tests automatiques.
-attention donc lors des modifications.
+Fichier principal pour la detection des inclusions.
+Ce fichier est utilise pour les tests automatiques.
+Attention donc lors des modifications.
 """
 
 
 import sys
+import time
+from random import randint
 # import matplotlib.pyplot as plt
 from tycat import read_instance
+
+
+def generateur_polygones(nom_fichier):
+    """Génère 500 carrés les uns dans les autres dans nom_fichier"""
+    with open(nom_fichier, 'w') as fichier:
+        for indice in range(500):
+            point1 = str(indice) + " " + str(0 + indice) + " " + str(0 + indice) + "\n"
+            point2 = str(indice) + " " + str(600 - indice) + " " + str(0 + indice) + "\n"
+            point3 = str(indice) + " " + str(600 - indice) + " " + str(600 - indice) + "\n"
+            point4 = str(indice) + " " + str(0 + indice) + " " + str(600 - indice) + "\n"
+            fichier.writelines(point1 + point2 + point3 + point4)
+
 
 
 def vecteur_polygone(nom_fichier):
     """Convertit le fichier en un vcteur de polygone"""
     with open(nom_fichier, 'r') as fichier:
         tab = fichier.readlines()
-        nb_poly = int(tab[-1][0])
+        nb_poly = int(tab[-1].strip('\n').split()[0])
         vect_poly = [[] for _ in range(nb_poly + 1)]
         for ligne in tab:
             point = ligne.strip('\n').split()
@@ -35,16 +49,15 @@ def coupe_segment(segment, point):
         return False
     elif segment[0][1] == point[1] and segment[1][1] == point[1]:
         return False
+
+    # On a vérifié que l'ordonnée du point est entre celles des deux points du segments
+
     else:
         if segment[1][0] - segment[0][0] == 0:
-            coef_dir = 0
-        else:
-            coef_dir = (segment[1][1] - segment[0][1])/(segment[1][0] - segment[0][0])
+            return point[0] < segment[1][0]  # On vérifie que le point est à gauche du segment
+        coef_dir = (segment[1][1] - segment[0][1])/(segment[1][0] - segment[0][0])
         ord_origine = segment[0][1] - coef_dir * segment[0][0]
-        if coef_dir * point[0] + ord_origine >= point[1]:
-            return True
-        else:
-            return False
+        return (point[1] - ord_origine)/coef_dir > point[0]
 
 
 def inclusion_point(polygone, point):
@@ -54,10 +67,9 @@ def inclusion_point(polygone, point):
     for indice in range(-1, nb_pts - 1):
         segment = [polygone[indice], polygone[indice + 1]]
         if coupe_segment(segment, point):
-            compteur += 1
-    if compteur % 2 == 1:
-        return True
-    return False
+            if point[1] != segment[1][1]:
+                compteur += 1
+    return compteur % 2 == 1
 
 
 def trouve_inclusions(polygones):
@@ -114,6 +126,14 @@ def trouve_inclusions2(polygones):
     return vect_inclu
 
 
+def chrono(func, polygones):
+    """Chronomètre le temps d'exécution de la fonction func"""
+    debut = time.time()
+    func(polygones)
+    fin = time.time()
+    return fin - debut
+
+
 def tracage_courbe(fonction):
     """Trace  une courbe de performance en temps en fonction du nombre de
     polygones utilisés."""
@@ -127,10 +147,12 @@ def main():
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    for fichier in sys.argv[1:]:
-        polygones = vecteur_polygone(fichier)
-        inclusions = trouve_inclusions2(polygones)
-        print(inclusions)
+    generateur_polygones("test.poly")
+    polygones = vecteur_polygone("test.poly")
+    inclusions = trouve_inclusions2(polygones)
+    print(inclusions[:100])
+    print('La méthode 1 met ' + str(chrono(trouve_inclusions, polygones)) + " a calculer le vecteur d'inclusions du fichier")
+    print('La méthode 2 met ' + str(chrono(trouve_inclusions2, polygones)) + " a calculer le vecteur d'inclusions du fichier")
 
 
 
