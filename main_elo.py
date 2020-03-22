@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 # from tycat import read_instance
 import numpy as np
 from polygon import Polygon
+from point import Point
 
 
 def convert_polygones(nom_fichier):
@@ -39,8 +40,11 @@ def aire_polygones(vect_poly):
     et la case d'indice 1 est l'aire en valeur absolue du polygone correspondant
     """
     vect_aires = []
-    for indice in range(len(vect_poly)):
-        polygones = Polygon(vect_poly[indice])
+    for indice_cour in range(len(vect_poly)):
+        points = []
+        for indice in range(len(vect_poly[indice_cour])):
+            points.append(Point(vect_poly[indice_cour][indice]))
+        polygones = Polygon(points)
         vect_aires.append([indice, abs(polygones.area())])
     return vect_aires
 
@@ -62,14 +66,7 @@ def tri_fusion(vect_aires):
     else:
         vect_aires1 = [vect_aires[x] for x in range(len(vect_aires)//2)]
         vect_aires2 = [vect_aires[x] for x in range(len(vect_aires)//2,len(vect_aires))]
-        return fusion(trifusion(vect_aires1),trifusion(vect_aires2))
-
-
-def indice_tri(vect_aires, indice_polygone):
-    indice_cour = 0
-    while indice_polygone != vect_aires[indice_cour][0]:
-        indice_cour += 1
-    return indice_cour
+        return fusion(tri_fusion(vect_aires1),tri_fusion(vect_aires2))
 
 
 # Complexité: O(1)
@@ -113,7 +110,7 @@ def inclusion_point(polygone, point):
 
 def trouve_inclusions4(vect_poly, indice_polygone, vect_aires, vect_inclusions):
     point_poly = vect_poly[indice_polygone][0]
-    indice_cour = indice_tri(vect_aires, indice_polygone)
+    indice_cour = vect_aires[indice_polygone][0]
     while not inclusion_point(vect_poly[indice_cour], point_poly):
         if indice_cour == len(vect_aires) - 1:
             vect_inclusions[indice_polygone] = -1
