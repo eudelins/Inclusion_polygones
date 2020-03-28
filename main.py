@@ -89,7 +89,9 @@ def inclusion_point(polygone, point):
     for indice in range(-1, nb_pts - 1):
         segment = [polygone[indice], polygone[indice + 1]]
         if coupe_segment(segment, point):
-            if point[1] != segment[1][1]:
+            if point[1] != segment[0][1] and point[1] != segment[1][1]:
+                compteur += 1
+            elif (polygone[indice - 1][1] < point[1] < segment[1][1]) or (polygone[indice - 1][1] > point[1] > segment[1][1]):
                 compteur += 1
     return compteur % 2 == 1
 
@@ -135,8 +137,8 @@ def trouve_inclusions2(polygones):
         appartient_deja = False  # Indique si polygon appartient déjà à un polygone
         poly_appartient = -1  # Numéro du polygone dans lequel polygon est inclu
         for i_autre_polygon in range(len(polygones)):
-            autre_polygon = polygones[i_autre_polygon]
             if i_autre_polygon != index:
+                autre_polygon = polygones[i_autre_polygon]
                 if inclusion_point(autre_polygon, polygon[0]):
                     if not appartient_deja or inclusion_point(polygones[poly_appartient], autre_polygon[0]):
                         appartient_deja = True
@@ -282,7 +284,9 @@ def inclusion_point2(polygone, point):
     for indice in range(-1, nb_pts - 1):
         segment = [polygone.points[indice], polygone.points[indice + 1]]
         if coupe_segment2(segment, point):
-            if point.coordinates[1] != segment[1].coordinates[1]:
+            if point.coordinates[1] != segment[1].coordinates[1] and point.coordinates[1] != segment[0].coordinates[1]:
+                compteur += 1
+            elif (polygone.points[indice - 1].coordinates[1] < point.coordinates[1] < segment[1].coordinates[1]) or (polygone.points[indice - 1].coordinates[1] > point.coordinates[1] > segment[1].coordinates[1]):
                 compteur += 1
     return compteur % 2 == 1
 
@@ -294,7 +298,7 @@ def trouve_inclusions4(polygones):
     polygone contenant le ieme polygone (-1 si aucun)
     """
     vect_aires, nb_poly = tri_fusion(aire_polygones(polygones)), len(polygones)
-    vect_inclusions = [-1] * nb_poly
+    vect_inclusions = [-1 for _ in range(nb_poly)]
     for i_polygon in range(1, nb_poly):
         num_polygon, _, polygon, = vect_aires[i_polygon]
         i_autre_polygon =  i_polygon - 1
@@ -307,13 +311,13 @@ def trouve_inclusions4(polygones):
     return vect_inclusions
 
 
-def transforme(poly):
-    """Change un tableau de couple en Polygon"""
-    n = len(poly)
-    liste_points = [Point([0, 0])] * n
-    for i_point in range(n):
-        liste_points[i_point] = Point(poly[i_point])
-    return Polygon(liste_points)
+# def transforme(poly):
+#     """Change un tableau de couple en Polygon"""
+#     n = len(poly)
+#     liste_points = [Point([0, 0])] * n
+#     for i_point in range(n):
+#         liste_points[i_point] = Point(poly[i_point])
+#     return Polygon(liste_points)
 
 
 def main():
@@ -322,18 +326,9 @@ def main():
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    for fichier in sys.argv[1:]:
-        polygones2 = vecteur_polygone(fichier)
-        polygones1 = [transforme(polygon) for polygon in polygones2]
-        inclusion1 = trouve_inclusions4(polygones1)
-        inclusion2 = trouve_inclusions2(polygones2)
-        inclusion3 = trouve_inclusions3(polygones2)
-        print(inclusion1)
-        print('\n--------------------------------------------------------------\n')
-        print(inclusion2)
-        print('\n--------------------------------------------------------------\n')
-        print(inclusion3)
-        print(chrono(trouve_inclusions4, polygones1))
+    polygones1 = read_instance("lourd.poly")
+    inclusion1 = trouve_inclusions4(polygones1)
+    print(inclusion1)
 
 
 
