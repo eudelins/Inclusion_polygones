@@ -96,135 +96,22 @@ def inclusion_point(polygone, point):
     return compteur % 2 == 1
 
 
-# Complexité: O(n³ * nb_pts_poly) avec n le nb de polygone
-def trouve_inclusions(polygones):
-    """
-    renvoie le vecteur des inclusions la ieme case contient l'indice du
-    polygone contenant le ieme polygone (-1 si aucun)
-    """
-    vect_inclu = [[] for _ in range(len(polygones))]
-    for index_poly in range(len(polygones)):
-        polygone = polygones[index_poly]
-        for indice in range(len(polygones)):
-            autre_polygone = polygones[indice]
-            if indice != index_poly and inclusion_point(autre_polygone, polygone[0]):
-                vect_inclu[index_poly].append(indice)
-    for index_poly in range(len(polygones)):
-        if len(vect_inclu[index_poly]) == 0:
-            vect_inclu[index_poly] = -1
-        else:
-            for indice in vect_inclu[index_poly]:
-                b = True
-                for j in vect_inclu[index_poly]:
-                    if indice != j and not inclusion_point(polygones[j], polygones[indice][0]):
-                        b = False
-                        break
-                if b:
-                    vect_inclu[index_poly] = indice
-                    break
-    return vect_inclu
-
-
-# Complexité: O(n² * nb_pts_poly) avec n le nb de polygone
-def trouve_inclusions2(polygones):
-    """
-    renvoie le vecteur des inclusions la ieme case contient l'indice du
-    polygone contenant le ieme polygone (-1 si aucun)
-    """
-    vect_inclu = [-1 for _ in range(len(polygones))]
-    for index in range(len(polygones)):
-        polygon = polygones[index]
-        appartient_deja = False  # Indique si polygon appartient déjà à un polygone
-        poly_appartient = -1  # Numéro du polygone dans lequel polygon est inclu
-        for i_autre_polygon in range(len(polygones)):
-            if i_autre_polygon != index:
-                autre_polygon = polygones[i_autre_polygon]
-                if inclusion_point(autre_polygon, polygon[0]):
-                    if not appartient_deja or inclusion_point(polygones[poly_appartient], autre_polygon[0]):
-                        appartient_deja = True
-                        poly_appartient = i_autre_polygon
-        vect_inclu[index] = poly_appartient
-    return vect_inclu
-
-
-# Complexité: O(n² * nb_pts_poly) avec n le nb de polygone
-def trouve_inclusions3(polygones):
-    """
-    renvoie le vecteur des inclusions la ieme case contient l'indice du
-    polygone contenant le ieme polygone (-1 si aucun)
-    """
-    vect_inclu = [-1 for _ in range(len(polygones))]
-    for index in range(len(polygones)):
-        polygon = polygones[index]
-        poly_appartient = vect_inclu[index]  # Numéro du polygone dans lequel polygon est inclu
-        appartient_deja = (poly_appartient != -1)  # Indique si polygon appartient déjà à un polygone
-        for i_autre_polygon in range(index + 1, len(polygones)):
-            autre_polygon = polygones[i_autre_polygon]
-            if i_autre_polygon != poly_appartient:
-                if inclusion_point(autre_polygon, polygon[0]):
-                    if not appartient_deja or inclusion_point(polygones[poly_appartient], autre_polygon[0]):
-                        appartient_deja = True
-                        poly_appartient = i_autre_polygon
-                if inclusion_point(polygon, autre_polygon[0]):
-                    if vect_inclu[i_autre_polygon] == -1 or inclusion_point(polygones[vect_inclu[i_autre_polygon]], polygon[0]):
-                        vect_inclu[i_autre_polygon] = index
-        vect_inclu[index] = poly_appartient
-    return vect_inclu
-
-
-def chrono(func, polygones):
-    """Chronomètre le temps d'exécution de la fonction func"""
-    debut = time.time()
-    func(polygones)
-    fin = time.time()
-    return fin - debut
-
-
-def tracage_courbe():
-    """Trace  une courbe de performance en temps en fonction du nombre de
-    polygones utilisés."""
-    # plt.clr()
-    les_x = [100 * i for i in range(30)]
-    les_y_fct1 = [chrono(trouve_inclusions3, generateur_polygones(nb_poly)) for nb_poly in les_x]
-    les_y_fct2 = [chrono(trouve_inclusions2, generateur_polygones(nb_poly)) for nb_poly in les_x]
-    plt.plot(les_x, les_y_fct1, c = 'r' ,label = 'Fonction trouve_inclusions3')
-    plt.plot(les_x, les_y_fct2, c = 'g' , label = 'Fonction trouve_inclusions2')
-    plt.xlabel("Nombre de polygones")
-    plt.ylabel("Temps d'exécution de la fonction (s)")
-    plt.legend()
-    plt.title('Temps en fonction du nombre de polygones')
-    plt.savefig("Temps en fonction du nombre de polygones 2")
-
-
-# def main():
-#     """
-#     charge chaque fichier .poly donne
-#     trouve les inclusions
-#     affiche l'arbre en format texte
-#     """
-    # tracage_courbe()
-    # generateur_fichier("test.poly", 500)
-    # polygones = vecteur_polygone(sys.argv[1])
-    # print('La méthode 2 met ' + str(chrono(trouve_inclusions2, polygones)) + " a calculer le vecteur d'inclusions du fichier")
-    # print('La méthode 3 met ' + str(chrono(trouve_inclusions3, polygones)) + " a calculer le vecteur d'inclusions du fichier")
-
-
 def fusion(vecteur1, vecteur2):
     """Fusionne deux vecteurs triés selon le 2ème élément de chaque
     sous-tableaux en un vecteur trié selon le 2ème élément des sous-tableaux"""
     i1, i2, n1, n2 = 0, 0, len(vecteur1), len(vecteur2)
-    fus = []
+    fus = [_ for _ in range(n1 + n2)]
     while i1 < n1 and i2 < n2:
-        if vecteur1[i1][1] < vecteur2[i2][1]:
-            fus.append(vecteur1[i1])
+        if vecteur1[i1][1] > vecteur2[i2][1]:
+            fus[i1 + i2] = (vecteur1[i1])
             i1 += 1
         else:
-            fus.append(vecteur2[i2])
+            fus[i1 + i2] = (vecteur2[i2])
             i2 += 1
     if i1 == n1:
-        fus.extend(vecteur2[i2:])
+        fus[i1 + i2:] = (vecteur2[i2:])
     else:
-        fus.extend(vecteur1[i1:])
+        fus[i1 + i2:] = (vecteur1[i1:])
     return fus
 
 
@@ -291,33 +178,87 @@ def inclusion_point2(polygone, point):
     return compteur % 2 == 1
 
 
+class Noeud:
+    """
+    Le but est de créer un arbre dont chaque noeud contient les indices des
+    polygones et a pour fils les polygones inclus dedans
+    """
+    def __init__(self, valeur):
+        self.valeur = valeur
+        self.fils = []
 
-def trouve_inclusions4(polygones):
+    def insere(self, polygones, num_polygon):
+        """Insere le ième polygon de polygones dans self"""
+        polygon, est_inclu = polygones[num_polygon], False
+        for node in self.fils:
+            num_autre_polygon = node.valeur
+            autre_polygon = polygones[num_autre_polygon]
+            if inclusion_point2(autre_polygon, polygon.points[0]):
+                est_inclu = True
+                node.insere(polygones, num_polygon)
+                break
+        if not est_inclu:
+            self.fils.append(Noeud(num_polygon))
+
+
+def complete_vect_inclu(pere, node, vect_inclusions):
+    """Complete le vecteur d'inclusions"""
+    num_polygon = node.valeur
+    vect_inclusions[num_polygon] = pere
+    for fils in node.fils:
+        complete_vect_inclu(num_polygon, fils, vect_inclusions)
+
+
+def trouve_inclusions5(polygones):
     """
     renvoie le vecteur des inclusions la ieme case contient l'indice du
     polygone contenant le ieme polygone (-1 si aucun)
     """
     vect_aires, nb_poly = tri_fusion(aire_polygones(polygones)), len(polygones)
-    vect_inclusions = [-1 for _ in range(nb_poly)]
-    for i_polygon in range(1, nb_poly):
-        num_polygon, _, polygon, = vect_aires[i_polygon]
-        i_autre_polygon =  i_polygon - 1
-        while i_autre_polygon >= 0:
-            num_autre_polygon, _, autre_polygon = vect_aires[i_autre_polygon]
-            if inclusion_point2(autre_polygon, polygon.points[0]):
-                vect_inclusions[num_polygon] = num_autre_polygon
-                break
-            i_autre_polygon -= 1
+    arbre_inclu, vect_inclusions = Noeud(-1), [-1 for _ in range(nb_poly)]
+    for i_polygon in range(nb_poly):
+        num_polygon, _, polygon = vect_aires[i_polygon]
+        arbre_inclu.insere(polygones, num_polygon)
+    for node in arbre_inclu.fils:
+        complete_vect_inclu(-1, node, vect_inclusions)
     return vect_inclusions
 
 
-# def transforme(poly):
-#     """Change un tableau de couple en Polygon"""
-#     n = len(poly)
-#     liste_points = [Point([0, 0])] * n
-#     for i_point in range(n):
-#         liste_points[i_point] = Point(poly[i_point])
-#     return Polygon(liste_points)
+def tracage_courbe():
+    """Trace  une courbe de performance en temps en fonction du nombre de
+    polygones utilisés."""
+    # plt.clr()
+    les_x = [100 * i for i in range(30)]
+    les_y_fct1 = [chrono(trouve_inclusions3, generateur_polygones(nb_poly)) for nb_poly in les_x]
+    les_y_fct2 = [chrono(trouve_inclusions2, generateur_polygones(nb_poly)) for nb_poly in les_x]
+    plt.plot(les_x, les_y_fct1, c = 'r' ,label = 'Fonction trouve_inclusions3')
+    plt.plot(les_x, les_y_fct2, c = 'g' , label = 'Fonction trouve_inclusions2')
+    plt.xlabel("Nombre de polygones")
+    plt.ylabel("Temps d'exécution de la fonction (s)")
+    plt.legend()
+    plt.title('Temps en fonction du nombre de polygones')
+    plt.savefig("Temps en fonction du nombre de polygones 2")
+
+
+# def main():
+#     """
+#     charge chaque fichier .poly donne
+#     trouve les inclusions
+#     affiche l'arbre en format texte
+#     """
+    # tracage_courbe()
+    # generateur_fichier("test.poly", 500)
+    # polygones = vecteur_polygone(sys.argv[1])
+    # print('La méthode 2 met ' + str(chrono(trouve_inclusions2, polygones)) + " a calculer le vecteur d'inclusions du fichier")
+    # print('La méthode 3 met ' + str(chrono(trouve_inclusions3, polygones)) + " a calculer le vecteur d'inclusions du fichier")
+
+
+def chrono(func, polygones):
+    """Chronomètre le temps d'exécution de la fonction func"""
+    debut = time.time()
+    func(polygones)
+    fin = time.time()
+    return fin - debut
 
 
 def main():
@@ -326,9 +267,13 @@ def main():
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    polygones1 = read_instance("lourd.poly")
-    inclusion1 = trouve_inclusions4(polygones1)
-    print(inclusion1)
+    polygones = read_instance(sys.argv[1])
+    inclusion = trouve_inclusions5(polygones)
+    print(chrono(trouve_inclusions5, polygones))
+    # m = 0
+    # for _ in range(10):
+    #     m += chrono(trouve_inclusions4, polygones1)
+    # print(m/10)
 
 
 
