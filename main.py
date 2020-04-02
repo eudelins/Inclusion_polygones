@@ -121,7 +121,7 @@ def tri_fusion(vect_aires):
         return vect_aires
     else:
         vect_aires1 = [vect_aires[x] for x in range(len(vect_aires)//2)]
-        vect_aires2 = [vect_aires[x] for x in range(len(vect_aires)//2,len(vect_aires))]
+        vect_aires2 = [vect_aires[x] for x in range(len(vect_aires)//2, len(vect_aires))]
         return fusion(tri_fusion(vect_aires1), tri_fusion(vect_aires2))
 
 
@@ -231,8 +231,8 @@ def tracage_courbe():
     les_x = [100 * i for i in range(30)]
     les_y_fct1 = [chrono(trouve_inclusions3, generateur_polygones(nb_poly)) for nb_poly in les_x]
     les_y_fct2 = [chrono(trouve_inclusions2, generateur_polygones(nb_poly)) for nb_poly in les_x]
-    plt.plot(les_x, les_y_fct1, c = 'r' ,label = 'Fonction trouve_inclusions3')
-    plt.plot(les_x, les_y_fct2, c = 'g' , label = 'Fonction trouve_inclusions2')
+    plt.plot(les_x, les_y_fct1, c='r', label='Fonction trouve_inclusions3')
+    plt.plot(les_x, les_y_fct2, c='g', label='Fonction trouve_inclusions2')
     plt.xlabel("Nombre de polygones")
     plt.ylabel("Temps d'exécution de la fonction (s)")
     plt.legend()
@@ -267,15 +267,10 @@ def main():
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    polygones = read_instance(sys.argv[1])
-    inclusion = trouve_inclusions5(polygones)
-    print(chrono(trouve_inclusions5, polygones))
-    # m = 0
-    # for _ in range(10):
-    #     m += chrono(trouve_inclusions4, polygones1)
-    # print(m/10)
-
-
+    for fichier in sys.argv[1:]
+        polygones = read_instance(fichier)
+        inclusion = trouve_inclusions5(polygones)
+        print(inclusion)
 
 
 if __name__ == "__main__":
