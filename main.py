@@ -333,7 +333,7 @@ def main():
     """
     for fichier in sys.argv[1:]:
         polygones = read_instance(fichier)
-        inclusion = trouve_inclusions4(polygones)
+        inclusion = trouve_inclusions5(polygones)
         print(inclusion)
 
 
