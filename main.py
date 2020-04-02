@@ -224,6 +224,25 @@ def trouve_inclusions5(polygones):
     return vect_inclusions
 
 
+def trouve_inclusions4(polygones):
+    """
+    renvoie le vecteur des inclusions la ieme case contient l'indice du
+    polygone contenant le ieme polygone (-1 si aucun)
+    """
+    vect_aires, nb_poly = tri_fusion(aire_polygones(polygones)), len(polygones)
+    vect_inclusions = [-1 for _ in range(nb_poly)]
+    for i_polygon in range(1, nb_poly):
+        num_polygon, _, polygon, = vect_aires[i_polygon]
+        i_autre_polygon =  i_polygon - 1
+        while i_autre_polygon >= 0:
+            num_autre_polygon, _, autre_polygon = vect_aires[i_autre_polygon]
+            if inclusion_point2(autre_polygon, polygon.points[0]):
+                vect_inclusions[num_polygon] = num_autre_polygon
+                break
+            i_autre_polygon -= 1
+    return vect_inclusions
+
+
 def tracage_courbe():
     """Trace  une courbe de performance en temps en fonction du nombre de
     polygones utilisés."""
@@ -269,7 +288,7 @@ def main():
     """
     for fichier in sys.argv[1:]
         polygones = read_instance(fichier)
-        inclusion = trouve_inclusions5(polygones)
+        inclusion = trouve_inclusions4(polygones)
         print(inclusion)
 
 
