@@ -85,14 +85,26 @@ def coupe_segment(segment, point):
 def inclusion_point(polygone, point):
     """Renvoie True si le point est inclu dans le polygone, False sinon"""
     nb_pts = len(polygone)
+    abscisse_pts = [pts[0] for pts in polygone]
+    if not (min(abscisse_pts) < point[0] < max(abscisse_pts)):
+        return False
+
+    ordonnée_pts = [pts[1] for pts in polygone]
+    if not (min(ordonnée_pts) < point[1] < max(ordonnée_pts)):
+        return False
+
     compteur = 0
     for indice in range(-1, nb_pts - 1):
         segment = [polygone[indice], polygone[indice + 1]]
         if coupe_segment(segment, point):
             if point[1] != segment[0][1] and point[1] != segment[1][1]:
                 compteur += 1
-            elif (polygone[indice - 1][1] < point[1] < segment[1][1]) or (polygone[indice - 1][1] > point[1] > segment[1][1]):
-                compteur += 1
+            else:
+                id_point_prec = indice - 1
+                while (point[1] == polygone[id_point_prec][1]):
+                    id_point_prec -= 1
+                if (polygone[id_point_prec][1] < point[1] < segment[1][1]) or (polygone[id_point_prec][1] > point[1] > segment[1][1]):
+                    compteur += 1
     return compteur % 2 == 1
 
 
@@ -167,14 +179,26 @@ def coupe_segment2(segment, point):
 def inclusion_point2(polygone, point):
     """Renvoie True si le point est inclu dans le polygone, False sinon"""
     nb_pts = len(polygone.points)
+    abscisse_pts = [pts.coordinates[0] for pts in polygone.points]
+    if not (min(abscisse_pts) < point.coordinates[0] < max(abscisse_pts)):
+        return False
+
+    ordonnée_pts = [pts.coordinates[1] for pts in polygone.points]
+    if not (min(ordonnée_pts) < point.coordinates[1] < max(ordonnée_pts)):
+        return False
+
     compteur = 0
     for indice in range(-1, nb_pts - 1):
         segment = [polygone.points[indice], polygone.points[indice + 1]]
         if coupe_segment2(segment, point):
             if point.coordinates[1] != segment[1].coordinates[1] and point.coordinates[1] != segment[0].coordinates[1]:
                 compteur += 1
-            elif (polygone.points[indice - 1].coordinates[1] < point.coordinates[1] < segment[1].coordinates[1]) or (polygone.points[indice - 1].coordinates[1] > point.coordinates[1] > segment[1].coordinates[1]):
-                compteur += 1
+            else:
+                id_point_prec = indice - 1
+                while (point.coordinates[1] == polygone.points[id_point_prec].coordinates[1]):
+                    id_point_prec -= 1
+                if (polygone.points[id_point_prec].coordinates[1] < point.coordinates[1] < segment[1].coordinates[1]) or (polygone.points[id_point_prec].coordinates[1] > point.coordinates[1] > segment[1].coordinates[1]):
+                    compteur += 1
     return compteur % 2 == 1
 
 
@@ -243,6 +267,27 @@ def trouve_inclusions4(polygones):
     return vect_inclusions
 
 
+def trouve_inclusions2(polygones):
+    """
+    renvoie le vecteur des inclusions la ieme case contient l'indice du
+    polygone contenant le ieme polygone (-1 si aucun)
+    """
+    vect_inclu = [-1 for _ in range(len(polygones))]
+    for index in range(len(polygones)):
+        polygon = polygones[index]
+        appartient_deja = False  # Indique si polygon appartient déjà à un polygone
+        poly_appartient = -1  # Numéro du polygone dans lequel polygon est inclu
+        for i_autre_polygon in range(len(polygones)):
+            if i_autre_polygon != index:
+                autre_polygon = polygones[i_autre_polygon]
+                if inclusion_point(autre_polygon, polygon[0]):
+                    if not appartient_deja or inclusion_point(polygones[poly_appartient], autre_polygon[0]):
+                        appartient_deja = True
+                        poly_appartient = i_autre_polygon
+        vect_inclu[index] = poly_appartient
+    return vect_inclu
+
+
 def tracage_courbe():
     """Trace  une courbe de performance en temps en fonction du nombre de
     polygones utilisés."""
@@ -286,9 +331,9 @@ def main():
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    for fichier in sys.argv[1:]
+    for fichier in sys.argv[1:]:
         polygones = read_instance(fichier)
-        inclusion = trouve_inclusions4(polygones)
+        inclusion = trouve_inclusions5(polygones)
         print(inclusion)
 
 
