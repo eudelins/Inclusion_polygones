@@ -85,6 +85,14 @@ def coupe_segment(segment, point):
 def inclusion_point(polygone, point):
     """Renvoie True si le point est inclu dans le polygone, False sinon"""
     nb_pts = len(polygone)
+    abscisse_pts = [pts[0] for pts in polygone]
+    if not (min(abscisse_pts) < point[0] < max(abscisse_pts)):
+        return False
+
+    ordonnée_pts = [pts[1] for pts in polygone]
+    if not (min(ordonnée_pts) < point[1] < max(ordonnée_pts)):
+        return False
+
     compteur = 0
     for indice in range(-1, nb_pts - 1):
         segment = [polygone[indice], polygone[indice + 1]]
@@ -171,6 +179,14 @@ def coupe_segment2(segment, point):
 def inclusion_point2(polygone, point):
     """Renvoie True si le point est inclu dans le polygone, False sinon"""
     nb_pts = len(polygone.points)
+    abscisse_pts = [pts.coordinates[0] for pts in polygone.points]
+    if not (min(abscisse_pts) < point.coordinates[0] < max(abscisse_pts)):
+        return False
+
+    ordonnée_pts = [pts.coordinates[1] for pts in polygone.points]
+    if not (min(ordonnée_pts) < point.coordinates[1] < max(ordonnée_pts)):
+        return False
+
     compteur = 0
     for indice in range(-1, nb_pts - 1):
         segment = [polygone.points[indice], polygone.points[indice + 1]]
