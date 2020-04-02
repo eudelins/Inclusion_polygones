@@ -91,8 +91,12 @@ def inclusion_point(polygone, point):
         if coupe_segment(segment, point):
             if point[1] != segment[0][1] and point[1] != segment[1][1]:
                 compteur += 1
-            elif (polygone[indice - 1][1] < point[1] < segment[1][1]) or (polygone[indice - 1][1] > point[1] > segment[1][1]):
-                compteur += 1
+            else:
+                id_point_prec = indice - 1
+                while (point[1] == polygone[id_point_prec][1]):
+                    id_point_prec -= 1
+                if (polygone[id_point_prec][1] < point[1] < segment[1][1]) or (polygone[id_point_prec][1] > point[1] > segment[1][1]):
+                    compteur += 1
     return compteur % 2 == 1
 
 
@@ -173,8 +177,12 @@ def inclusion_point2(polygone, point):
         if coupe_segment2(segment, point):
             if point.coordinates[1] != segment[1].coordinates[1] and point.coordinates[1] != segment[0].coordinates[1]:
                 compteur += 1
-            elif (polygone.points[indice - 1].coordinates[1] < point.coordinates[1] < segment[1].coordinates[1]) or (polygone.points[indice - 1].coordinates[1] > point.coordinates[1] > segment[1].coordinates[1]):
-                compteur += 1
+            else:
+                id_point_prec = indice - 1
+                while (point.coordinates[1] == polygone.points[id_point_prec].coordinates[1]):
+                    id_point_prec -= 1
+                if (polygone.points[id_point_prec].coordinates[1] < point.coordinates[1] < segment[1].coordinates[1]) or (polygone.points[id_point_prec].coordinates[1] > point.coordinates[1] > segment[1].coordinates[1]):
+                    compteur += 1
     return compteur % 2 == 1
 
 
@@ -241,6 +249,27 @@ def trouve_inclusions4(polygones):
                 break
             i_autre_polygon -= 1
     return vect_inclusions
+
+
+def trouve_inclusions2(polygones):
+    """
+    renvoie le vecteur des inclusions la ieme case contient l'indice du
+    polygone contenant le ieme polygone (-1 si aucun)
+    """
+    vect_inclu = [-1 for _ in range(len(polygones))]
+    for index in range(len(polygones)):
+        polygon = polygones[index]
+        appartient_deja = False  # Indique si polygon appartient déjà à un polygone
+        poly_appartient = -1  # Numéro du polygone dans lequel polygon est inclu
+        for i_autre_polygon in range(len(polygones)):
+            if i_autre_polygon != index:
+                autre_polygon = polygones[i_autre_polygon]
+                if inclusion_point(autre_polygon, polygon[0]):
+                    if not appartient_deja or inclusion_point(polygones[poly_appartient], autre_polygon[0]):
+                        appartient_deja = True
+                        poly_appartient = i_autre_polygon
+        vect_inclu[index] = poly_appartient
+    return vect_inclu
 
 
 def tracage_courbe():
