@@ -286,7 +286,7 @@ def main():
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    for fichier in sys.argv[1:]
+    for fichier in sys.argv[1:]:
         polygones = read_instance(fichier)
         inclusion = trouve_inclusions4(polygones)
         print(inclusion)
