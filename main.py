@@ -10,8 +10,6 @@ Attention donc lors des modifications.
 
 import sys
 import time
-from random import randint
-import matplotlib.pyplot as plt
 from tycat import read_instance
 from geo.polygon import Polygon
 from geo.point import Point
@@ -75,7 +73,10 @@ def coupe_segment(segment, point):
         return False
 
     # On a vérifié que l'ordonnée du point est entre celles des deux points du segments
-
+    if segment[0][0] < point[0] and segment[1][0] < point[0]:
+        return False
+    elif segment[0][0] > point[0] and segment[1][0] > point[0]:
+        return True
     else:
         return isLeft(segment, point)
 
@@ -169,7 +170,10 @@ def coupe_segment2(segment, point):
         return False
 
     # On a vérifié que l'ordonnée du point est entre celles des deux points du segments
-
+    if segment[0].coordinates[0] < point.coordinates[0] and segment[1].coordinates[0] < point.coordinates[0]:
+        return False
+    elif segment[0].coordinates[0] > point.coordinates[0] and segment[1].coordinates[0] > point.coordinates[0]:
+        return True
     else:
         return isLeft2(segment, point)
 
