@@ -33,10 +33,12 @@ def main():
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    for fichier in sys.argv[1:]:
-        polygones = read_instance(fichier)
+    polygones = read_instance(sys.argv[1])
+    if sys.argv[2] == '4':
+        print(chrono(trouve_inclusions4, polygones))
+    else:
         print(chrono(trouve_inclusions5, polygones))
 
 
-if __name__ == "__main__":
-    main()
+
+main()
