@@ -15,7 +15,6 @@ import matplotlib.pyplot as plt
 from tycat import read_instance
 from geo.polygon import Polygon
 from geo.point import Point
-import numpy as np
 
 
 def generateur_fichier(nom_fichier, nb_poly):
