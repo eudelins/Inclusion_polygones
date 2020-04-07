@@ -201,4 +201,6 @@ def main():
     print('La méthode 3 met ' + str(chrono(trouve_inclusions3, polygones)) + " a calculer le vecteur d'inclusions du fichier")
 
 
-main()
+
+if __name__ == "__main__":
+    main()

@@ -13,6 +13,7 @@ import time
 from tycat import read_instance
 from geo.polygon import Polygon
 from geo.point import Point
+from collections import deque
 
 
 def vecteur_polygone(nom_fichier):
@@ -211,28 +212,51 @@ class Noeud:
     def __init__(self, valeur, aire):
         self.valeur = valeur
         self.aire = aire
-        self.fils = []
+        self.fils = deque()
 
     def insere(self, polygones, num_polygon, aire_poly, polygon):
         """Insere le ième polygon de polygones dans self"""
-        est_inclu = False
-        for node in self.fils:
+        noeud_a_tester, est_inclu = self.fils.copy(), False
+        while noeud_a_tester:
+            node = noeud_a_tester.popleft()
             num_autre_polygon = node.valeur
             autre_polygon = polygones[num_autre_polygon]
             if node.aire > aire_poly and inclusion_point2(autre_polygon, polygon.points[0]):
                 est_inclu = True
-                node.insere(polygones, num_polygon, aire_poly, polygon)
-                break
+                noeud_a_tester = node.fils.copy()
         if not est_inclu:
             self.fils.append(Noeud(num_polygon, aire_poly))
+        else:
+            node.fils.append(Noeud(num_polygon, aire_poly))
+
+        # est_inclu = False
+        # for node in self.fils:
+        #     num_autre_polygon = node.valeur
+        #     autre_polygon = polygones[num_autre_polygon]
+        #     if node.aire > aire_poly and inclusion_point2(autre_polygon, polygon.points[0]):
+        #         est_inclu = True
+        #         node.insere(polygones, num_polygon, aire_poly, polygon)
+        #         break
+        # if not est_inclu:
+        #     self.fils.append(Noeud(num_polygon, aire_poly))
 
 
 def complete_vect_inclu(pere, node, vect_inclusions):
     """Complete le vecteur d'inclusions"""
     num_polygon = node.valeur
     vect_inclusions[num_polygon] = pere
-    for fils in node.fils:
-        complete_vect_inclu(num_polygon, fils, vect_inclusions)
+    noeud_a_completer = node.fils.copy()
+    while noeud_a_completer:
+        pere = num_polygon
+        noeud = noeud_a_completer.pop()
+        num_polygon = noeud.valeur
+        vect_inclusions[num_polygon] = pere
+        noeud_a_completer.extend(noeud.fils)
+
+    # num_polygon = node.valeur
+    # vect_inclusions[num_polygon] = pere
+    # for fils in node.fils:
+    #     complete_vect_inclu(num_polygon, fils, vect_inclusions)
 
 
 def trouve_inclusions5(polygones):
