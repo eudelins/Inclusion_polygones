@@ -241,12 +241,9 @@ class Noeud:
         #     self.fils.append(Noeud(num_polygon, aire_poly))
 
 
-def complete_vect_inclu(pere, node, vect_inclusions):
+def complete_vect_inclu(pere, vect_inclusions):
     """Complete le vecteur d'inclusions"""
-    num_polygon = node.valeur
-    vect_inclusions[num_polygon] = pere
-    pere = num_polygon
-    noeuds_a_completer = [[pere, node.fils.copy()]]
+    noeuds_a_completer = [[pere.valeur, pere.fils.copy()]]
     while noeuds_a_completer:
         noeuds_fils = noeuds_a_completer.pop()
         while noeuds_fils[1]:
@@ -271,8 +268,8 @@ def trouve_inclusions5(polygones):
     for i_polygon in range(nb_poly):
         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
         arbre_inclu.insere(polygones, num_polygon, aire_poly, polygon)
-    for node in arbre_inclu.fils:
-        complete_vect_inclu(-1, node, vect_inclusions)
+    # for node in arbre_inclu.fils:
+    complete_vect_inclu(arbre_inclu, vect_inclusions)
     return vect_inclusions
 
 
