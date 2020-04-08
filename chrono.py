@@ -14,7 +14,7 @@ from tycat import read_instance
 from geo.polygon import Polygon
 from geo.point import Point
 import numpy as np
-from main import trouve_inclusions2, trouve_inclusions4, trouve_inclusions5
+from main import trouve_inclusions2, trouve_inclusions4, trouve_inclusions5, trouve_inclusions6
 
 
 
@@ -36,6 +36,8 @@ def main():
     polygones = read_instance(sys.argv[1])
     if sys.argv[2] == '4':
         print(chrono(trouve_inclusions4, polygones))
+    if sys.argv[2] == '6':
+        print(chrono(trouve_inclusions6, polygones))
     else:
         print(chrono(trouve_inclusions5, polygones))
 

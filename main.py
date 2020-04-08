@@ -204,6 +204,27 @@ def inclusion_point2(polygone, point):
     return compteur % 2 == 1
 
 
+def trouve_inclusions4(polygones):
+    """
+    renvoie le vecteur des inclusions la ieme case contient l'indice du
+    polygone contenant le ieme polygone (-1 si aucun)
+    """
+    vect_aires, nb_poly = tri_fusion(aire_polygones(polygones)), len(polygones)
+    vect_inclusions = [-1 for _ in range(nb_poly)]
+    for i_polygon in range(1, nb_poly):
+        num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
+        i_autre_polygon =  i_polygon - 1
+        while i_autre_polygon >= 0:
+            num_autre_polygon, aire_autre_poly, autre_polygon = vect_aires[i_autre_polygon]
+            if aire_poly != aire_autre_poly and inclusion_point2(autre_polygon, polygon.points[0]):
+                vect_inclusions[num_polygon] = num_autre_polygon
+                break
+            i_autre_polygon -= 1
+    return vect_inclusions
+
+
+
+
 class Noeud:
     """
     Le but est de créer un arbre dont chaque noeud contient les indices des
@@ -229,16 +250,18 @@ class Noeud:
         else:
             noeud_inclu.fils.append(Noeud(num_polygon, aire_poly))
 
-        # est_inclu = False
-        # for node in self.fils:
-        #     num_autre_polygon = node.valeur
-        #     autre_polygon = polygones[num_autre_polygon]
-        #     if node.aire > aire_poly and inclusion_point2(autre_polygon, polygon.points[0]):
-        #         est_inclu = True
-        #         node.insere(polygones, num_polygon, aire_poly, polygon)
-        #         break
-        # if not est_inclu:
-        #     self.fils.append(Noeud(num_polygon, aire_poly))
+    def insere_rec(self, polygones, num_polygon, aire_poly, polygon):
+        """Insere le ième polygon de polygones dans self"""
+        est_inclu = False
+        for node in self.fils:
+            num_autre_polygon = node.valeur
+            autre_polygon = polygones[num_autre_polygon]
+            if node.aire > aire_poly and inclusion_point2(autre_polygon, polygon.points[0]):
+                est_inclu = True
+                node.insere(polygones, num_polygon, aire_poly, polygon)
+                break
+        if not est_inclu:
+            self.fils.append(Noeud(num_polygon, aire_poly))
 
 
 def complete_vect_inclu(pere, vect_inclusions):
@@ -252,10 +275,13 @@ def complete_vect_inclu(pere, vect_inclusions):
             vect_inclusions[num_polygon] = noeuds_fils[0]
             noeuds_a_completer.append([num_polygon, noeud.fils.copy()])
 
-    # num_polygon = node.valeur
-    # vect_inclusions[num_polygon] = pere
-    # for fils in node.fils:
-    #     complete_vect_inclu(num_polygon, fils, vect_inclusions)
+
+def complete_vect_inclu_rec(pere, vect_inclusions):
+    """Complete le vecteur d'inclusions"""
+    for fils in pere.fils:
+        num_polygon = fils.valeur
+        vect_inclusions[num_polygon] = pere.valeur
+        complete_vect_inclu(fils, vect_inclusions)
 
 
 def trouve_inclusions5(polygones):
@@ -268,27 +294,21 @@ def trouve_inclusions5(polygones):
     for i_polygon in range(nb_poly):
         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
         arbre_inclu.insere(polygones, num_polygon, aire_poly, polygon)
-    # for node in arbre_inclu.fils:
     complete_vect_inclu(arbre_inclu, vect_inclusions)
     return vect_inclusions
 
 
-def trouve_inclusions4(polygones):
+def trouve_inclusions6(polygones):
     """
     renvoie le vecteur des inclusions la ieme case contient l'indice du
     polygone contenant le ieme polygone (-1 si aucun)
     """
     vect_aires, nb_poly = tri_fusion(aire_polygones(polygones)), len(polygones)
-    vect_inclusions = [-1 for _ in range(nb_poly)]
-    for i_polygon in range(1, nb_poly):
-        num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
-        i_autre_polygon =  i_polygon - 1
-        while i_autre_polygon >= 0:
-            num_autre_polygon, aire_autre_poly, autre_polygon = vect_aires[i_autre_polygon]
-            if aire_poly != aire_autre_poly and inclusion_point2(autre_polygon, polygon.points[0]):
-                vect_inclusions[num_polygon] = num_autre_polygon
-                break
-            i_autre_polygon -= 1
+    arbre_inclu, vect_inclusions = Noeud(-1, float("inf")), [-1 for _ in range(nb_poly)]
+    for i_polygon in range(nb_poly):
+        num_polygon, aire_poly, polygon = vect_aires[i_polygon]
+        arbre_inclu.insere_rec(polygones, num_polygon, aire_poly, polygon)
+    complete_vect_inclu_rec(arbre_inclu, vect_inclusions)
     return vect_inclusions
 
 
