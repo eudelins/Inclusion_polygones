@@ -222,12 +222,12 @@ class Noeud:
             num_autre_polygon = node.valeur
             autre_polygon = polygones[num_autre_polygon]
             if node.aire > aire_poly and inclusion_point2(autre_polygon, polygon.points[0]):
-                est_inclu = True
+                est_inclu, noeud_inclu = True, node
                 noeud_a_tester = node.fils.copy()
         if not est_inclu:
             self.fils.append(Noeud(num_polygon, aire_poly))
         else:
-            node.fils.append(Noeud(num_polygon, aire_poly))
+            noeud_inclu.fils.append(Noeud(num_polygon, aire_poly))
 
         # est_inclu = False
         # for node in self.fils:
@@ -245,13 +245,15 @@ def complete_vect_inclu(pere, node, vect_inclusions):
     """Complete le vecteur d'inclusions"""
     num_polygon = node.valeur
     vect_inclusions[num_polygon] = pere
-    noeud_a_completer = node.fils.copy()
-    while noeud_a_completer:
-        pere = num_polygon
-        noeud = noeud_a_completer.pop()
-        num_polygon = noeud.valeur
-        vect_inclusions[num_polygon] = pere
-        noeud_a_completer.extend(noeud.fils)
+    pere = num_polygon
+    noeuds_a_completer = [[pere, node.fils.copy()]]
+    while noeuds_a_completer:
+        noeuds_fils = noeuds_a_completer.pop()
+        while noeuds_fils[1]:
+            noeud = noeuds_fils[1].pop()
+            num_polygon = noeud.valeur
+            vect_inclusions[num_polygon] = noeuds_fils[0]
+            noeuds_a_completer.append([num_polygon, noeud.fils.copy()])
 
     # num_polygon = node.valeur
     # vect_inclusions[num_polygon] = pere
