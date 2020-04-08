@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from tycat import read_instance
 from geo.polygon import Polygon
 from geo.point import Point
-from main import trouve_inclusions4, trouve_inclusions5
+from main import trouve_inclusions4, trouve_inclusions5, trouve_inclusions6
 from methode1 import trouve_inclusions, trouve_inclusions2, trouve_inclusions3
 
 
@@ -84,11 +84,13 @@ def tracage_courbe1():
     les_y_fct3 = [chrono(trouve_inclusions3, generateur_polygones(nb_poly)) for nb_poly in les_x]
     les_y_fct4 = [chrono(trouve_inclusions4, generateur_polygones2(nb_poly)) for nb_poly in les_x]
     les_y_fct5 = [chrono(trouve_inclusions5, generateur_polygones2(nb_poly)) for nb_poly in les_x]
+    les_y_fct6 = [chrono(trouve_inclusions6, generateur_polygones2(nb_poly)) for nb_poly in les_x]
     plt.plot(les_x, les_y_fct1, c='r', label='Fonction trouve_inclusions')
     plt.plot(les_x, les_y_fct2, c='g', label='Fonction trouve_inclusions2')
     plt.plot(les_x, les_y_fct3, c='b', label='Fonction trouve_inclusions3')
     plt.plot(les_x, les_y_fct4, c='k', label='Fonction trouve_inclusions4')
     plt.plot(les_x, les_y_fct5, c='m', label='Fonction trouve_inclusions5')
+    plt.plot(les_x, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
     plt.xlabel("Nombre de polygones")
     plt.ylabel("Temps d'exécution de la fonction (s)")
     plt.legend()
@@ -103,11 +105,11 @@ def tracage_courbe2():
     les_y_fct2 = [chrono(trouve_inclusions2, generateur_polygones(nb_poly)) for nb_poly in les_x]
     les_y_fct3 = [chrono(trouve_inclusions3, generateur_polygones(nb_poly)) for nb_poly in les_x]
     les_y_fct4 = [chrono(trouve_inclusions4, generateur_polygones2(nb_poly)) for nb_poly in les_x]
-    les_y_fct5 = [chrono(trouve_inclusions5, generateur_polygones2(nb_poly)) for nb_poly in les_x]
+    les_y_fct6 = [chrono(trouve_inclusions6, generateur_polygones2(nb_poly)) for nb_poly in les_x]
     plt.plot(les_x, les_y_fct2, c='g', label='Fonction trouve_inclusions2')
     plt.plot(les_x, les_y_fct3, c='b', label='Fonction trouve_inclusions3')
     plt.plot(les_x, les_y_fct4, c='k', label='Fonction trouve_inclusions4')
-    plt.plot(les_x, les_y_fct5, c='m', label='Fonction trouve_inclusions5')
+    plt.plot(les_x, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
     plt.xlabel("Nombre de polygones")
     plt.ylabel("Temps d'exécution de la fonction (s)")
     plt.legend()

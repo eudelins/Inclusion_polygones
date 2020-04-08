@@ -209,7 +209,8 @@ def trouve_inclusions4(polygones):
     renvoie le vecteur des inclusions la ieme case contient l'indice du
     polygone contenant le ieme polygone (-1 si aucun)
     """
-    vect_aires, nb_poly = tri_fusion(aire_polygones(polygones)), len(polygones)
+    vect_aires = sorted(aire_polygones(polygones), key=lambda poly: poly[1], reverse=True)
+    nb_poly = len(polygones)
     vect_inclusions = [-1 for _ in range(nb_poly)]
     for i_polygon in range(1, nb_poly):
         num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
@@ -289,7 +290,8 @@ def trouve_inclusions5(polygones):
     renvoie le vecteur des inclusions la ieme case contient l'indice du
     polygone contenant le ieme polygone (-1 si aucun)
     """
-    vect_aires, nb_poly = tri_fusion(aire_polygones(polygones)), len(polygones)
+    vect_aires = sorted(aire_polygones(polygones), key=lambda poly: poly[1], reverse=True)
+    nb_poly = len(polygones)
     arbre_inclu, vect_inclusions = Noeud(-1, float("inf")), [-1 for _ in range(nb_poly)]
     for i_polygon in range(nb_poly):
         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
@@ -303,7 +305,8 @@ def trouve_inclusions6(polygones):
     renvoie le vecteur des inclusions la ieme case contient l'indice du
     polygone contenant le ieme polygone (-1 si aucun)
     """
-    vect_aires, nb_poly = tri_fusion(aire_polygones(polygones)), len(polygones)
+    vect_aires = sorted(aire_polygones(polygones), key=lambda poly: poly[1], reverse=True)
+    nb_poly = len(polygones)
     arbre_inclu, vect_inclusions = Noeud(-1, float("inf")), [-1 for _ in range(nb_poly)]
     for i_polygon in range(nb_poly):
         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
