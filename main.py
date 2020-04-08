@@ -293,8 +293,8 @@ def trouve_inclusions5(polygones):
     arbre_inclu, vect_inclusions = Noeud(-1, float("inf")), [-1 for _ in range(nb_poly)]
     for i_polygon in range(nb_poly):
         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
-        arbre_inclu.insere(polygones, num_polygon, aire_poly, polygon)
-    complete_vect_inclu(arbre_inclu, vect_inclusions)
+        arbre_inclu.insere_rec(polygones, num_polygon, aire_poly, polygon)
+    complete_vect_inclu_rec(arbre_inclu, vect_inclusions)
     return vect_inclusions
 
 
@@ -307,8 +307,8 @@ def trouve_inclusions6(polygones):
     arbre_inclu, vect_inclusions = Noeud(-1, float("inf")), [-1 for _ in range(nb_poly)]
     for i_polygon in range(nb_poly):
         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
-        arbre_inclu.insere_rec(polygones, num_polygon, aire_poly, polygon)
-    complete_vect_inclu_rec(arbre_inclu, vect_inclusions)
+        arbre_inclu.insere(polygones, num_polygon, aire_poly, polygon)
+    complete_vect_inclu(arbre_inclu, vect_inclusions)
     return vect_inclusions
 
 
@@ -320,7 +320,7 @@ def main():
     """
     for fichier in sys.argv[1:]:
         polygones = read_instance(fichier)
-        inclusion = trouve_inclusions5(polygones)
+        inclusion = trouve_inclusions6(polygones)
         print(inclusion)
 
 
