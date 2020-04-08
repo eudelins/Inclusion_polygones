@@ -205,22 +205,9 @@ def coupe_segment2(segment, point):
 #     return compteur % 2 == 1
 
 
-def inclusion_point2(polygone, autre_polygon):
+def inclusion_point2(polygone, point):
     """Renvoie True si autres est inclu dans le polygone, False sinon"""
     nb_pts = len(polygone.points)
-    # abscisse_pts = [pts.coordinates[0] for pts in polygone.points]
-    # min_abs, max_abs = min(abscisse_pts), max(abscisse_pts)
-    # ordonnée_pts = [pts.coordinates[1] for pts in polygone.points]
-    # min_ord, max_ord = min(ordonnée_pts), max(ordonnée_pts)
-    # for point in autre_polygon.points:
-    #     if not min_abs < point.coordinates[0] < max_abs:
-    #         return False
-    #     if not min_ord < point.coordinates[1] < max_ord:
-    #         return False
-    # if not (polygone.bounding_quadrant().intersect(autre_polygon.bounding_quadrant())):
-    #     return False
-
-    point = autre_polygon.points[0]
     compteur = 0
     for indice in range(-1, nb_pts - 1):
         segment = [polygone.points[indice], polygone.points[indice + 1]]
@@ -253,7 +240,7 @@ def trouve_inclusions4(polygones):
             num_autre_polygon, aire_autre_poly, autre_polygon = vect_aires[i_autre_polygon]
             if aire_poly != aire_autre_poly:
                 if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
-                    if inclusion_point2(autre_polygon, polygon):
+                    if inclusion_point2(autre_polygon, polygon.points[0]):
                         vect_inclusions[num_polygon] = num_autre_polygon
                         break
             i_autre_polygon -= 1
@@ -272,30 +259,34 @@ class Noeud:
         self.aire = aire
         self.fils = deque()
 
-    def insere(self, polygones, num_polygon, aire_poly, polygon):
+    def insere(self, polygones, num_polygon, aire_poly, polygon, quadrants):
         """Insere le ième polygon de polygones dans self"""
         noeud_a_tester, est_inclu = self.fils.copy(), False
         while noeud_a_tester:
             node = noeud_a_tester.popleft()
             num_autre_polygon = node.valeur
             autre_polygon = polygones[num_autre_polygon]
-            if node.aire > aire_poly and inclusion_point2(autre_polygon, polygon.points[0]):
-                est_inclu, noeud_inclu = True, node
-                noeud_a_tester = node.fils.copy()
+            if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
+                if node.aire > aire_poly:
+                    if inclusion_point2(autre_polygon, polygon.points[0]):
+                        est_inclu, noeud_inclu = True, node
+                        noeud_a_tester = node.fils.copy()
         if not est_inclu:
             self.fils.append(Noeud(num_polygon, aire_poly))
         else:
             noeud_inclu.fils.append(Noeud(num_polygon, aire_poly))
 
-    def insere_rec(self, polygones, num_polygon, aire_poly, polygon):
+    def insere_rec(self, polygones, num_polygon, aire_poly, polygon, quadrants):
         """Insere le ième polygon de polygones dans self"""
         est_inclu = False
         for node in self.fils:
             num_autre_polygon = node.valeur
             autre_polygon = polygones[num_autre_polygon]
-            if node.aire > aire_poly and inclusion_point2(autre_polygon, polygon.points[0]):
-                est_inclu = True
-                node.insere(polygones, num_polygon, aire_poly, polygon)
+            if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
+                if node.aire > aire_poly:
+                    if inclusion_point2(autre_polygon, polygon.points[0]):
+                        est_inclu = True
+                        node.insere(polygones, num_polygon, aire_poly, polygon, quadrants)
                 break
         if not est_inclu:
             self.fils.append(Noeud(num_polygon, aire_poly))
@@ -327,11 +318,12 @@ def trouve_inclusions5(polygones):
     polygone contenant le ieme polygone (-1 si aucun)
     """
     vect_aires = sorted(aire_polygones(polygones), key=lambda poly: poly[1], reverse=True)
+    quadrants = [polygon.bounding_quadrant() for polygon in polygones]
     nb_poly = len(polygones)
     arbre_inclu, vect_inclusions = Noeud(-1, float("inf")), [-1 for _ in range(nb_poly)]
     for i_polygon in range(nb_poly):
         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
-        arbre_inclu.insere_rec(polygones, num_polygon, aire_poly, polygon)
+        arbre_inclu.insere_rec(polygones, num_polygon, aire_poly, polygon, quadrants)
     complete_vect_inclu_rec(arbre_inclu, vect_inclusions)
     return vect_inclusions
 
@@ -342,11 +334,12 @@ def trouve_inclusions6(polygones):
     polygone contenant le ieme polygone (-1 si aucun)
     """
     vect_aires = sorted(aire_polygones(polygones), key=lambda poly: poly[1], reverse=True)
+    quadrants = [polygon.bounding_quadrant() for polygon in polygones]
     nb_poly = len(polygones)
     arbre_inclu, vect_inclusions = Noeud(-1, float("inf")), [-1 for _ in range(nb_poly)]
     for i_polygon in range(nb_poly):
         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
-        arbre_inclu.insere(polygones, num_polygon, aire_poly, polygon)
+        arbre_inclu.insere(polygones, num_polygon, aire_poly, polygon, quadrants)
     complete_vect_inclu(arbre_inclu, vect_inclusions)
     return vect_inclusions
 
@@ -359,7 +352,7 @@ def main():
     """
     for fichier in sys.argv[1:]:
         polygones = read_instance(fichier)
-        inclusion = trouve_inclusions4(polygones)
+        inclusion = trouve_inclusions5(polygones)
         print(inclusion)
 
 
