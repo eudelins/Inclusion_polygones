@@ -13,6 +13,7 @@ import time
 from tycat import read_instance
 from geo.polygon import Polygon
 from geo.point import Point
+from geo.quadrant import Quadrant
 from collections import deque
 
 
@@ -178,17 +179,48 @@ def coupe_segment2(segment, point):
 
 
 # Complexité: O(nb_pts du polygone)
-def inclusion_point2(polygone, point):
-    """Renvoie True si le point est inclu dans le polygone, False sinon"""
+# def inclusion_point2(polygone, point):
+#     """Renvoie True si le point est inclu dans le polygone, False sinon"""
+#     nb_pts = len(polygone.points)
+#     abscisse_pts = [pts.coordinates[0] for pts in polygone.points]
+#     if not (min(abscisse_pts) < point.coordinates[0] < max(abscisse_pts)):
+#         return False
+#
+#     ordonnée_pts = [pts.coordinates[1] for pts in polygone.points]
+#     if not (min(ordonnée_pts) < point.coordinates[1] < max(ordonnée_pts)):
+#         return False
+#
+#     compteur = 0
+#     for indice in range(-1, nb_pts - 1):
+#         segment = [polygone.points[indice], polygone.points[indice + 1]]
+#         if coupe_segment2(segment, point):
+#             if point.coordinates[1] != segment[1].coordinates[1] and point.coordinates[1] != segment[0].coordinates[1]:
+#                 compteur += 1
+#             else:
+#                 id_point_prec = indice - 1
+#                 while (point.coordinates[1] == polygone.points[id_point_prec].coordinates[1]):
+#                     id_point_prec -= 1
+#                 if (polygone.points[id_point_prec].coordinates[1] < point.coordinates[1] < segment[1].coordinates[1]) or (polygone.points[id_point_prec].coordinates[1] > point.coordinates[1] > segment[1].coordinates[1]):
+#                     compteur += 1
+#     return compteur % 2 == 1
+
+
+def inclusion_point2(polygone, autre_polygon):
+    """Renvoie True si autres est inclu dans le polygone, False sinon"""
     nb_pts = len(polygone.points)
-    abscisse_pts = [pts.coordinates[0] for pts in polygone.points]
-    if not (min(abscisse_pts) < point.coordinates[0] < max(abscisse_pts)):
-        return False
+    # abscisse_pts = [pts.coordinates[0] for pts in polygone.points]
+    # min_abs, max_abs = min(abscisse_pts), max(abscisse_pts)
+    # ordonnée_pts = [pts.coordinates[1] for pts in polygone.points]
+    # min_ord, max_ord = min(ordonnée_pts), max(ordonnée_pts)
+    # for point in autre_polygon.points:
+    #     if not min_abs < point.coordinates[0] < max_abs:
+    #         return False
+    #     if not min_ord < point.coordinates[1] < max_ord:
+    #         return False
+    # if not (polygone.bounding_quadrant().intersect(autre_polygon.bounding_quadrant())):
+    #     return False
 
-    ordonnée_pts = [pts.coordinates[1] for pts in polygone.points]
-    if not (min(ordonnée_pts) < point.coordinates[1] < max(ordonnée_pts)):
-        return False
-
+    point = autre_polygon.points[0]
     compteur = 0
     for indice in range(-1, nb_pts - 1):
         segment = [polygone.points[indice], polygone.points[indice + 1]]
@@ -204,12 +236,14 @@ def inclusion_point2(polygone, point):
     return compteur % 2 == 1
 
 
+
 def trouve_inclusions4(polygones):
     """
     renvoie le vecteur des inclusions la ieme case contient l'indice du
     polygone contenant le ieme polygone (-1 si aucun)
     """
     vect_aires = sorted(aire_polygones(polygones), key=lambda poly: poly[1], reverse=True)
+    quadrants = [polygon.bounding_quadrant() for polygon in polygones]
     nb_poly = len(polygones)
     vect_inclusions = [-1 for _ in range(nb_poly)]
     for i_polygon in range(1, nb_poly):
@@ -217,9 +251,11 @@ def trouve_inclusions4(polygones):
         i_autre_polygon =  i_polygon - 1
         while i_autre_polygon >= 0:
             num_autre_polygon, aire_autre_poly, autre_polygon = vect_aires[i_autre_polygon]
-            if aire_poly != aire_autre_poly and inclusion_point2(autre_polygon, polygon.points[0]):
-                vect_inclusions[num_polygon] = num_autre_polygon
-                break
+            if aire_poly != aire_autre_poly:
+                if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
+                    if inclusion_point2(autre_polygon, polygon):
+                        vect_inclusions[num_polygon] = num_autre_polygon
+                        break
             i_autre_polygon -= 1
     return vect_inclusions
 

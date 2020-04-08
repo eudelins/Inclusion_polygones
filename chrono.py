@@ -36,7 +36,7 @@ def main():
     polygones = read_instance(sys.argv[1])
     if sys.argv[2] == '4':
         print(chrono(trouve_inclusions4, polygones))
-    if sys.argv[2] == '5':
+    elif sys.argv[2] == '5':
         print(chrono(trouve_inclusions5, polygones))
     else:
         print(chrono(trouve_inclusions6, polygones))
