@@ -287,7 +287,7 @@ class Noeud:
                     if inclusion_point2(autre_polygon, polygon.points[0]):
                         est_inclu = True
                         node.insere(polygones, num_polygon, aire_poly, polygon, quadrants)
-                break
+                        break
         if not est_inclu:
             self.fils.append(Noeud(num_polygon, aire_poly))
 
