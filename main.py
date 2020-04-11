@@ -223,16 +223,16 @@ def trouve_inclusions4(polygones):
     quadrants = [polygon.bounding_quadrant() for polygon in polygones]
     nb_poly = len(polygones)
     vect_inclusions = [-1 for _ in range(nb_poly)]
-    saut, i_saut = [1], 0
+    saut = 1
     for i_polygon in range(1, nb_poly):
         num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
         
         if aire_poly < vect_aires[i_polygon - 1][1]:
-            saut.append(1)
+            saut = 1
             i_autre_polygon =  i_polygon - 1
         else:
-            saut[-1] += 1
-            i_autre_polygon =  i_polygon - saut[-1]
+            saut += 1
+            i_autre_polygon =  i_polygon - saut
         
         while i_autre_polygon >= 0:
             num_autre_polygon, aire_autre_poly, autre_polygon = vect_aires[i_autre_polygon]
