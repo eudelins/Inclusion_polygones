@@ -172,21 +172,6 @@ def trouve_inclusions3(polygones):
     return vect_inclu
 
 
-def tracage_courbe():
-    """Trace  une courbe de performance en temps en fonction du nombre de
-    polygones utilisés."""
-    # plt.clr()
-    les_x = [100 * i for i in range(30)]
-    les_y_fct1 = [chrono(trouve_inclusions3, generateur_polygones(nb_poly)) for nb_poly in les_x]
-    les_y_fct2 = [chrono(trouve_inclusions2, generateur_polygones(nb_poly)) for nb_poly in les_x]
-    plt.plot(les_x, les_y_fct1, c = 'r' ,label = 'Fonction trouve_inclusions3')
-    plt.plot(les_x, les_y_fct2, c = 'g' , label = 'Fonction trouve_inclusions2')
-    plt.xlabel("Nombre de polygones")
-    plt.ylabel("Temps d'exécution de la fonction (s)")
-    plt.legend()
-    plt.title('Temps en fonction du nombre de polygones')
-    plt.savefig("Temps en fonction du nombre de polygones 2")
-
 
 def main():
     """
@@ -194,12 +179,7 @@ def main():
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    tracage_courbe()
-    generateur_fichier("test.poly", 500)
-    polygones = vecteur_polygone(sys.argv[1])
-    print('La méthode 2 met ' + str(chrono(trouve_inclusions2, polygones)) + " a calculer le vecteur d'inclusions du fichier")
-    print('La méthode 3 met ' + str(chrono(trouve_inclusions3, polygones)) + " a calculer le vecteur d'inclusions du fichier")
-
+    return None
 
 
 if __name__ == "__main__":

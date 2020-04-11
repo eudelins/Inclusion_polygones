@@ -30,7 +30,6 @@ def vecteur_polygone(nom_fichier):
         return vect_poly
 
 
-# Complexité: O(1)
 def isLeft(segment, point):
     """Renvoie True si le point est à gauche du segment"""
     if segment[1][0] - segment[0][0] == 0:
@@ -40,7 +39,6 @@ def isLeft(segment, point):
     return (point[1] - ord_origine)/coef_dir > point[0]
 
 
-# Complexité: O(1)
 def coupe_segment(segment, point):
     """Renvoie True si la demi-droite horizontal partant de point et allant
     vers la droite coupe le segment et False sinon"""
@@ -60,7 +58,6 @@ def coupe_segment(segment, point):
         return isLeft(segment, point)
 
 
-# Complexité: O(nb_pts du polygone)
 def inclusion_point(polygone, point):
     """Renvoie True si le point est inclu dans le polygone, False sinon"""
     nb_pts = len(polygone)
@@ -87,6 +84,34 @@ def inclusion_point(polygone, point):
     return compteur % 2 == 1
 
 
+def trouve_inclusions(polygones):
+    """
+    renvoie le vecteur des inclusions la ieme case contient l'indice du
+    polygone contenant le ieme polygone (-1 si aucun)
+    """
+    vect_inclu = [[] for _ in range(len(polygones))]
+    for index_poly in range(len(polygones)):
+        polygone = polygones[index_poly]
+        for indice in range(len(polygones)):
+            autre_polygone = polygones[indice]
+            if indice != index_poly and inclusion_point(autre_polygone, polygone[0]):
+                vect_inclu[index_poly].append(indice)
+    for index_poly in range(len(polygones)):
+        if len(vect_inclu[index_poly]) == 0:
+            vect_inclu[index_poly] = -1
+        else:
+            for indice in vect_inclu[index_poly]:
+                b = True
+                for j in vect_inclu[index_poly]:
+                    if indice != j and not inclusion_point(polygones[j], polygones[indice][0]):
+                        b = False
+                        break
+                if b:
+                    vect_inclu[index_poly] = indice
+                    break
+    return vect_inclu
+
+
 def trouve_inclusions2(polygones):
     """
     renvoie le vecteur des inclusions la ieme case contient l'indice du
@@ -108,33 +133,28 @@ def trouve_inclusions2(polygones):
     return vect_inclu
 
 
-def fusion(vecteur1, vecteur2):
-    """Fusionne deux vecteurs triés selon le 2ème élément de chaque
-    sous-tableaux en un vecteur trié selon le 2ème élément des sous-tableaux"""
-    i1, i2, n1, n2 = 0, 0, len(vecteur1), len(vecteur2)
-    fus = [_ for _ in range(n1 + n2)]
-    while i1 < n1 and i2 < n2:
-        if vecteur1[i1][1] > vecteur2[i2][1]:
-            fus[i1 + i2] = (vecteur1[i1])
-            i1 += 1
-        else:
-            fus[i1 + i2] = (vecteur2[i2])
-            i2 += 1
-    if i1 == n1:
-        fus[i1 + i2:] = (vecteur2[i2:])
-    else:
-        fus[i1 + i2:] = (vecteur1[i1:])
-    return fus
-
-
-def tri_fusion(vect_aires):
-    """Réalise un tri fusion sur les aires de vect_aires"""
-    if len(vect_aires) <= 1:
-        return vect_aires
-    else:
-        vect_aires1 = [vect_aires[x] for x in range(len(vect_aires)//2)]
-        vect_aires2 = [vect_aires[x] for x in range(len(vect_aires)//2, len(vect_aires))]
-        return fusion(tri_fusion(vect_aires1), tri_fusion(vect_aires2))
+def trouve_inclusions3(polygones):
+    """
+    renvoie le vecteur des inclusions la ieme case contient l'indice du
+    polygone contenant le ieme polygone (-1 si aucun)
+    """
+    vect_inclu = [-1 for _ in range(len(polygones))]
+    for index in range(len(polygones)):
+        polygon = polygones[index]
+        poly_appartient = vect_inclu[index]  # Numéro du polygone dans lequel polygon est inclu
+        appartient_deja = (poly_appartient != -1)  # Indique si polygon appartient déjà à un polygone
+        for i_autre_polygon in range(index + 1, len(polygones)):
+            autre_polygon = polygones[i_autre_polygon]
+            if i_autre_polygon != poly_appartient:
+                if inclusion_point(autre_polygon, polygon[0]):
+                    if not appartient_deja or inclusion_point(polygones[poly_appartient], autre_polygon[0]):
+                        appartient_deja = True
+                        poly_appartient = i_autre_polygon
+                if inclusion_point(polygon, autre_polygon[0]):
+                    if vect_inclu[i_autre_polygon] == -1 or inclusion_point(polygones[vect_inclu[i_autre_polygon]], polygon[0]):
+                        vect_inclu[i_autre_polygon] = index
+        vect_inclu[index] = poly_appartient
+    return vect_inclu
 
 
 def aire_polygones(polygones):
@@ -148,7 +168,6 @@ def aire_polygones(polygones):
     return vect_aires
 
 
-# Complexité: O(1)
 def isLeft2(segment, point):
     """Renvoie True si le point est à gauche du segment"""
     if segment[1].coordinates[0] - segment[0].coordinates[0] == 0:
@@ -158,7 +177,6 @@ def isLeft2(segment, point):
     return (point.coordinates[1] - ord_origine)/coef_dir > point.coordinates[0]
 
 
-# Complexité: O(1)
 def coupe_segment2(segment, point):
     """Renvoie True si la demi-droite horizontal partant de point et allant
     vers la droite coupe le segment et False sinon"""
@@ -176,33 +194,6 @@ def coupe_segment2(segment, point):
         return True
     else:
         return isLeft2(segment, point)
-
-
-# Complexité: O(nb_pts du polygone)
-# def inclusion_point2(polygone, point):
-#     """Renvoie True si le point est inclu dans le polygone, False sinon"""
-#     nb_pts = len(polygone.points)
-#     abscisse_pts = [pts.coordinates[0] for pts in polygone.points]
-#     if not (min(abscisse_pts) < point.coordinates[0] < max(abscisse_pts)):
-#         return False
-#
-#     ordonnée_pts = [pts.coordinates[1] for pts in polygone.points]
-#     if not (min(ordonnée_pts) < point.coordinates[1] < max(ordonnée_pts)):
-#         return False
-#
-#     compteur = 0
-#     for indice in range(-1, nb_pts - 1):
-#         segment = [polygone.points[indice], polygone.points[indice + 1]]
-#         if coupe_segment2(segment, point):
-#             if point.coordinates[1] != segment[1].coordinates[1] and point.coordinates[1] != segment[0].coordinates[1]:
-#                 compteur += 1
-#             else:
-#                 id_point_prec = indice - 1
-#                 while (point.coordinates[1] == polygone.points[id_point_prec].coordinates[1]):
-#                     id_point_prec -= 1
-#                 if (polygone.points[id_point_prec].coordinates[1] < point.coordinates[1] < segment[1].coordinates[1]) or (polygone.points[id_point_prec].coordinates[1] > point.coordinates[1] > segment[1].coordinates[1]):
-#                     compteur += 1
-#     return compteur % 2 == 1
 
 
 def inclusion_point2(polygone, point):
@@ -223,7 +214,6 @@ def inclusion_point2(polygone, point):
     return compteur % 2 == 1
 
 
-
 def trouve_inclusions4(polygones):
     """
     renvoie le vecteur des inclusions la ieme case contient l'indice du
@@ -233,20 +223,26 @@ def trouve_inclusions4(polygones):
     quadrants = [polygon.bounding_quadrant() for polygon in polygones]
     nb_poly = len(polygones)
     vect_inclusions = [-1 for _ in range(nb_poly)]
+    saut, i_saut = [1], 0
     for i_polygon in range(1, nb_poly):
         num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
-        i_autre_polygon =  i_polygon - 1
+        
+        if aire_poly < vect_aires[i_polygon - 1][1]:
+            saut.append(1)
+            i_autre_polygon =  i_polygon - 1
+        else:
+            saut[-1] += 1
+            i_autre_polygon =  i_polygon - saut[-1]
+        
         while i_autre_polygon >= 0:
             num_autre_polygon, aire_autre_poly, autre_polygon = vect_aires[i_autre_polygon]
-            if aire_poly != aire_autre_poly:
+            if aire_poly < aire_autre_poly:
                 if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
                     if inclusion_point2(autre_polygon, polygon.points[0]):
                         vect_inclusions[num_polygon] = num_autre_polygon
                         break
             i_autre_polygon -= 1
     return vect_inclusions
-
-
 
 
 class Noeud:
@@ -257,6 +253,7 @@ class Noeud:
     def __init__(self, valeur, aire):
         self.valeur = valeur
         self.aire = aire
+        # self.pere = pere
         self.fils = deque()
 
     def insere(self, polygones, num_polygon, aire_poly, polygon, quadrants):
@@ -266,8 +263,8 @@ class Noeud:
             node = noeud_a_tester.popleft()
             num_autre_polygon = node.valeur
             autre_polygon = polygones[num_autre_polygon]
-            if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
-                if node.aire > aire_poly:
+            if node.aire > aire_poly:
+                if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
                     if inclusion_point2(autre_polygon, polygon.points[0]):
                         est_inclu, noeud_inclu = True, node
                         noeud_a_tester = node.fils.copy()
@@ -352,7 +349,7 @@ def main():
     """
     for fichier in sys.argv[1:]:
         polygones = read_instance(fichier)
-        inclusion = trouve_inclusions5(polygones)
+        inclusion = trouve_inclusions4(polygones)
         print(inclusion)
 
 

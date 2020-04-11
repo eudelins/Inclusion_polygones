@@ -85,6 +85,34 @@ def coupe_segment2(segment, point):
         return isLeft2(segment, point)
 
 
+
+# Complexité: O(nb_pts du polygone)
+# def inclusion_point2(polygone, point):
+#     """Renvoie True si le point est inclu dans le polygone, False sinon"""
+#     nb_pts = len(polygone.points)
+#     abscisse_pts = [pts.coordinates[0] for pts in polygone.points]
+#     if not (min(abscisse_pts) < point.coordinates[0] < max(abscisse_pts)):
+#         return False
+#
+#     ordonnée_pts = [pts.coordinates[1] for pts in polygone.points]
+#     if not (min(ordonnée_pts) < point.coordinates[1] < max(ordonnée_pts)):
+#         return False
+#
+#     compteur = 0
+#     for indice in range(-1, nb_pts - 1):
+#         segment = [polygone.points[indice], polygone.points[indice + 1]]
+#         if coupe_segment2(segment, point):
+#             if point.coordinates[1] != segment[1].coordinates[1] and point.coordinates[1] != segment[0].coordinates[1]:
+#                 compteur += 1
+#             else:
+#                 id_point_prec = indice - 1
+#                 while (point.coordinates[1] == polygone.points[id_point_prec].coordinates[1]):
+#                     id_point_prec -= 1
+#                 if (polygone.points[id_point_prec].coordinates[1] < point.coordinates[1] < segment[1].coordinates[1]) or (polygone.points[id_point_prec].coordinates[1] > point.coordinates[1] > segment[1].coordinates[1]):
+#                     compteur += 1
+#     return compteur % 2 == 1
+
+
 # Complexité: O(nb_pts du polygone)
 def inclusion_point2(polygone, point):
     """Renvoie True si le point est inclu dans le polygone, False sinon"""
@@ -118,6 +146,54 @@ def trouve_inclusions4(polygones):
                 break
             i_autre_polygon -= 1
     return vect_inclusions
+
+
+# class Arbre:
+#     def __init__(self):
+#         self.racine = Noeud(-1, float("inf"), None)
+#         self.feuilles = deque()
+#
+#     def insere_rec2(self, polygones, num_polygon, aire_poly, polygon, quadrants):
+#         """Insere le ième polygon de polygones dans self"""
+#         noeud_a_tester = self.feuilles.copy()
+#         while noeud_a_tester:
+#             node = noeud_a_tester.pop()
+#             est_feuille = node in self.feuilles
+#             if est_feuille:
+#                 self.feuilles.pop()
+#             num_autre_polygon = node.valeur
+#             autre_polygon = polygones[num_autre_polygon]
+#             if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
+#                 if node.aire > aire_poly:
+#                     if inclusion_point2(autre_polygon, polygon.points[0]):
+#                         new_noeud = Noeud(num_polygon, aire_poly, node)
+#                         node.fils.append(new_noeud)
+#                         self.feuilles.append(new_noeud)
+#                         return
+#             else:
+#                 if est_feuille:
+#                     self.feuilles.appendleft(node)
+#                 if node.pere is not None and node.pere not in noeud_a_tester:
+#                     noeud_a_tester.appendleft(node.pere)
+#         new_noeud = Noeud(num_polygon, aire_poly, self.racine)
+#         self.racine.fils.append(new_noeud)
+#         self.feuilles.append(new_noeud)
+
+
+# def trouve_inclusions7(polygones):
+#     """
+#     renvoie le vecteur des inclusions la ieme case contient l'indice du
+#     polygone contenant le ieme polygone (-1 si aucun)
+#     """
+#     vect_aires = sorted(aire_polygones(polygones), key=lambda poly: poly[1], reverse=True)
+#     quadrants = [polygon.bounding_quadrant() for polygon in polygones]
+#     nb_poly = len(polygones)
+#     arbre_inclu, vect_inclusions = Arbre(), [-1 for _ in range(nb_poly)]
+#     for i_polygon in range(nb_poly):
+#         num_polygon, aire_poly, polygon = vect_aires[i_polygon]
+#         arbre_inclu.insere_rec2(polygones, num_polygon, aire_poly, polygon, quadrants)
+#     complete_vect_inclu_rec(arbre_inclu.racine, vect_inclusions)
+#     return vect_inclusions
 
 
 # def transforme(poly):
