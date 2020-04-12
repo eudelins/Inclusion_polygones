@@ -227,11 +227,11 @@ def trouve_inclusions4(polygones):
     for i_polygon in range(1, nb_poly):
         num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
         
-        if aire_poly < vect_aires[i_polygon - 1][1]:
-            saut = 1
-            i_autre_polygon =  i_polygon - 1
-        else:
+        if abs(aire_poly - vect_aires[i_polygon - 1][1]) < 0.00000001:
             saut += 1
+            i_autre_polygon =  i_polygon - saut
+        else:
+            saut = 1
             i_autre_polygon =  i_polygon - saut
         
         while i_autre_polygon >= 0:
