@@ -214,6 +214,38 @@ def inclusion_point2(polygone, point):
     return compteur % 2 == 1
 
 
+def inf(point, poly_2):
+    """
+    Verifie si le point M est dans le polygone P
+    complexite : n
+    """
+    M = point.coordinates
+    P = poly_2
+    valid=0
+    # On itere sur les segments entre deux points
+    for seg in poly_2.segments():
+        # Recupere position de 2 points consecutifs
+        x1 = seg.endpoints[0].coordinates[0] - M[0]
+        x2 = seg.endpoints[1].coordinates[0] - M[0]
+        if x1 < 0 and x2 < 0 or x1 > 0 and x2 > 0 or x1 == 0 and x2 == 0: continue
+        y1 = seg.endpoints[0].coordinates[1] - M[1]
+        y2 = seg.endpoints[1].coordinates[1] - M[1]
+        # Decoupage de R en 4 (p1 [0,3])
+        p1 = 2 * (x1 <= 0) - (x1 == 0) + 2 * (x1 == 0 and y1 > 0)
+        p2 = 2 * (x2 <= 0) - (x2 == 0) + 2 * (x2 == 0 and y2 > 0)
+        # Matrice de passage d'une zone a une autre
+        C = [[[0, 0, 1, .5], # p1 = 0
+            [0, 0, 0, 0], # p1 = 1
+            [-1, 0, 0, -.5], # p1 = 2
+            [-.5, 0, .5, 0]], # p1 = 3
+            [[0, -.5, -1, 0], # p1 = 0
+            [.5, 0, -.5, 0], # p1 = 1
+            [1, .5, 0, 0], # p1 = 2
+            [0, 0, 0, 0]]] # p1 = 3
+        valid += C[(y1 * x2 - y2 * x1) * (x2 - x1) < 0][p1][p2]
+    return(bool(valid))
+
+
 def trouve_inclusions4(polygones):
     """
     renvoie le vecteur des inclusions la ieme case contient l'indice du
@@ -227,7 +259,7 @@ def trouve_inclusions4(polygones):
     for i_polygon in range(1, nb_poly):
         num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
         
-        if abs(aire_poly - vect_aires[i_polygon - 1][1]) < 0.00000001:
+        if aire_poly == vect_aires[i_polygon - 1][1]:
             saut += 1
             i_autre_polygon =  i_polygon - saut
         else:
@@ -238,7 +270,8 @@ def trouve_inclusions4(polygones):
             num_autre_polygon, aire_autre_poly, autre_polygon = vect_aires[i_autre_polygon]
             if aire_poly < aire_autre_poly:
                 if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
-                    if inclusion_point2(autre_polygon, polygon.points[0]):
+                    # if inclusion_point2(autre_polygon, polygon.points[0]):
+                    if inf(polygon.points[0], autre_polygon):
                         vect_inclusions[num_polygon] = num_autre_polygon
                         break
             i_autre_polygon -= 1
