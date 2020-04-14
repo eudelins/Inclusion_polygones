@@ -214,6 +214,19 @@ def inclusion_point2(polygone, point):
     return compteur % 2 == 1
 
 
+    # quadrillage = [[quadrants[vect_aires[0][0]], [vect_aires[0]]]]
+    # for i_polygon in range(1, nb_poly):
+    #     num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
+    #     alone = True
+    #     for case in quadrillage:
+    #         if case[0].intersect(quadrants[i_polygon]):
+    #             alone = False
+    #             case[0].update(quadrants[i_polygon])
+    #             case[1].append(vect_aires[i_polygon])
+    #     if alone:
+    #         quadrillage.append([quadrants[i_polygon], [vect_aires[i_polygon]]])
+
+
 def trouve_inclusions4(polygones):
     """
     renvoie le vecteur des inclusions la ieme case contient l'indice du
@@ -225,36 +238,24 @@ def trouve_inclusions4(polygones):
     vect_inclusions = [-1 for _ in range(nb_poly)]
     saut = 1
 
-    quadrillage = [[quadrants[vect_aires[0][0]], [vect_aires[0]]]]
     for i_polygon in range(1, nb_poly):
         num_polygon, aire_poly, polygon, = vect_aires[i_polygon]
-        for case in quadrillage:
-            if case[0].intersect(quadrants[i_polygon]):
-                case[0].update(quadrants[i_polygon])
-                case[1].append(vect_aires[i_polygon])
-                break
-        quadrillage.append([quadrants[i_polygon], [vect_aires[i_polygon]]])
-
-    for case in quadrillage:
-        nb_poly_case = len(case[1])
-        for i_polygon in range(1, nb_poly_case):
-            num_polygon, aire_poly, polygon, = case[1][i_polygon]
-            
-            if aire_poly == case[1][i_polygon - 1][1]:
-                saut += 1
-                i_autre_polygon =  i_polygon - saut
-            else:
-                saut = 1
-                i_autre_polygon =  i_polygon - saut
-            
-            while i_autre_polygon >= 0:
-                num_autre_polygon, aire_autre_poly, autre_polygon = case[1][i_autre_polygon]
-                if aire_poly < aire_autre_poly:
-                    if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
-                        if inclusion_point2(autre_polygon, polygon.points[0]):
-                            vect_inclusions[num_polygon] = num_autre_polygon
-                            break
-                i_autre_polygon -= 1
+        
+        if aire_poly == vect_aires[i_polygon - 1][1]:
+            saut += 1
+            i_autre_polygon =  i_polygon - saut
+        else:
+            saut = 1
+            i_autre_polygon =  i_polygon - saut
+        
+        while i_autre_polygon >= 0:
+            num_autre_polygon, aire_autre_poly, autre_polygon = vect_aires[i_autre_polygon]
+            if aire_poly < aire_autre_poly:
+                if quadrants[num_polygon].intersect(quadrants[num_autre_polygon]):
+                    if inclusion_point2(autre_polygon, polygon.points[0]):
+                        vect_inclusions[num_polygon] = num_autre_polygon
+                        break
+            i_autre_polygon -= 1
     return vect_inclusions
 
 
