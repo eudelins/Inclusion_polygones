@@ -13,10 +13,11 @@ import time
 from random import randint
 import matplotlib.pyplot as plt
 from tycat import read_instance
+from main import vecteur_polygone
 from geo.polygon import Polygon
 from geo.point import Point
 from main import trouve_inclusions4, trouve_inclusions5, trouve_inclusions6
-from methode1 import trouve_inclusions, trouve_inclusions2, trouve_inclusions3
+from main import trouve_inclusions, trouve_inclusions2, trouve_inclusions3
 
 
 def generateur_fichier(nom_fichier, nb_poly):
@@ -105,10 +106,12 @@ def tracage_courbe2():
     les_y_fct2 = [chrono(trouve_inclusions2, generateur_polygones(nb_poly)) for nb_poly in les_x]
     les_y_fct3 = [chrono(trouve_inclusions3, generateur_polygones(nb_poly)) for nb_poly in les_x]
     les_y_fct4 = [chrono(trouve_inclusions4, generateur_polygones2(nb_poly)) for nb_poly in les_x]
+    les_y_fct5 = [chrono(trouve_inclusions5, generateur_polygones2(nb_poly)) for nb_poly in les_x]
     les_y_fct6 = [chrono(trouve_inclusions6, generateur_polygones2(nb_poly)) for nb_poly in les_x]
     plt.plot(les_x, les_y_fct2, c='g', label='Fonction trouve_inclusions2')
     plt.plot(les_x, les_y_fct3, c='b', label='Fonction trouve_inclusions3')
-    plt.plot(les_x, les_y_fct4, c='k', label='Fonction trouve_inclusions4')
+    plt.plot(les_x, les_y_fct4, c='r', label='Fonction trouve_inclusions4')
+    plt.plot(les_x, les_y_fct5, c='m', label='Fonction trouve_inclusions5')
     plt.plot(les_x, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
     plt.xlabel("Nombre de polygones")
     plt.ylabel("Temps d'exécution de la fonction (s)")
@@ -117,13 +120,115 @@ def tracage_courbe2():
     plt.savefig("Performance2.png")
 
 
+def tracage_courbe3():
+    """Trace  une courbe de performance en temps en fonction du nombre de
+    polygones utilisés."""
+    les_x = [i * 100 for i in [5, 10, 15, 20, 25, 30, 35, 40]]
+    les_poly = ["tests/polygons/sqline-" + str(i * 100) + ".poly" for i in [5, 10, 15, 20, 25, 30, 35, 40]]
+    les_y_fct2 = [chrono(trouve_inclusions2, vecteur_polygone(poly)) for poly in les_poly]
+    les_y_fct3 = [chrono(trouve_inclusions3, vecteur_polygone(poly)) for poly in les_poly]
+    les_y_fct4 = [chrono(trouve_inclusions4, read_instance(poly)) for poly in les_poly]
+    les_y_fct5 = [chrono(trouve_inclusions5, read_instance(poly)) for poly in les_poly]
+    les_y_fct6 = [chrono(trouve_inclusions6, read_instance(poly)) for poly in les_poly]
+    plt.plot(les_x, les_y_fct2, c='g', label='Fonction trouve_inclusions2')
+    plt.plot(les_x, les_y_fct3, c='b', label='Fonction trouve_inclusions3')
+    plt.plot(les_x, les_y_fct4, c='r', label='Fonction trouve_inclusions4')
+    plt.plot(les_x, les_y_fct5, c='m', label='Fonction trouve_inclusions5')
+    plt.plot(les_x, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
+    plt.xlabel("Nombre de polygones")
+    plt.ylabel("Temps d'exécution de la fonction (s)")
+    plt.legend()
+    plt.title('Temps en fonction du nombre de polygones')
+    plt.savefig("Performance3.png")
+
+
+def tracage_courbe4():
+    """Trace  une courbe de performance en temps en fonction du nombre de
+    polygones utilisés."""
+    les_x = [i * 100 for i in [5, 10, 15, 20, 25, 30, 35, 40, 100, 200, 300, 400, 500]]
+    les_poly = ["tests/polygons/sqline-" + str(i) + ".poly" for i in les_x]
+    les_y_fct4 = [chrono(trouve_inclusions4, read_instance(poly)) for poly in les_poly]
+    les_y_fct6 = [chrono(trouve_inclusions6, read_instance(poly)) for poly in les_poly]
+    plt.plot(les_x, les_y_fct4, c='r', label='Fonction trouve_inclusions4')
+    plt.plot(les_x, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
+    plt.xlabel("Nombre de polygones")
+    plt.ylabel("Temps d'exécution de la fonction (s)")
+    plt.legend()
+    plt.title('Temps en fonction du nombre de polygones')
+    plt.savefig("Performance4.png")
+
+
+def tracage_courbe5():
+    """Trace  une courbe de performance en temps en fonction du nombre de
+    polygones utilisés."""
+    les_x = [i * 10 for i in [4, 5, 6]]
+    nb_poly = [x**2 for x in les_x]
+    les_poly = ["tests/polygons/sqgrid-" + str(i) + "-" + str(i) + ".poly" for i in les_x]
+    les_y_fct2 = [chrono(trouve_inclusions2, vecteur_polygone(poly)) for poly in les_poly]
+    les_y_fct3 = [chrono(trouve_inclusions3, vecteur_polygone(poly)) for poly in les_poly]
+    les_y_fct4 = [chrono(trouve_inclusions4, read_instance(poly)) for poly in les_poly]
+    les_y_fct5 = [chrono(trouve_inclusions5, read_instance(poly)) for poly in les_poly]
+    les_y_fct6 = [chrono(trouve_inclusions6, read_instance(poly)) for poly in les_poly]
+    plt.plot(nb_poly, les_y_fct2, c='g', label='Fonction trouve_inclusions2')
+    plt.plot(nb_poly, les_y_fct3, c='b', label='Fonction trouve_inclusions3')
+    plt.plot(nb_poly, les_y_fct4, c='r', label='Fonction trouve_inclusions4')
+    plt.plot(nb_poly, les_y_fct5, c='m', label='Fonction trouve_inclusions5')
+    plt.plot(nb_poly, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
+    plt.xlabel("Nombre de polygones")
+    plt.ylabel("Temps d'exécution de la fonction (s)")
+    plt.legend()
+    plt.title('Temps en fonction du nombre de polygones')
+    plt.savefig("Performance5.png")
+
+
+def tracage_courbe6():
+    """Trace  une courbe de performance en temps en fonction du nombre de
+    polygones utilisés."""
+    les_x = [i * 10 for i in [4, 5, 6, 7, 8, 9 ,10, 11]]
+    nb_poly = [x**2 for x in les_x]
+    les_poly = ["tests/polygons/sqgrid-" + str(i) + "-" + str(i) + ".poly" for i in les_x]
+    les_y_fct4 = [chrono(trouve_inclusions4, read_instance(poly)) for poly in les_poly]
+    les_y_fct6 = [chrono(trouve_inclusions6, read_instance(poly)) for poly in les_poly]
+    plt.plot(nb_poly, les_y_fct4, c='r', label='Fonction trouve_inclusions4')
+    plt.plot(nb_poly, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
+    plt.xlabel("Nombre de polygones")
+    plt.ylabel("Temps d'exécution de la fonction (s)")
+    plt.legend()
+    plt.title('Temps en fonction du nombre de polygones')
+    plt.savefig("Performance6.png")
+
+
+
+def tracage_courbe7():
+    """Trace  une courbe de performance en temps en fonction du nombre de
+    polygones utilisés."""
+    les_x = [i * 10 for i in [4, 5, 6]]
+    nb_poly = [x**2 for x in les_x]
+    les_poly = ["tests/polygons/circgrid-" + str(i) + "-" + str(i) + "-36.poly" for i in les_x]
+    les_y_fct2 = [chrono(trouve_inclusions2, vecteur_polygone(poly)) for poly in les_poly]
+    les_y_fct3 = [chrono(trouve_inclusions3, vecteur_polygone(poly)) for poly in les_poly]
+    les_y_fct4 = [chrono(trouve_inclusions4, read_instance(poly)) for poly in les_poly]
+    les_y_fct5 = [chrono(trouve_inclusions5, read_instance(poly)) for poly in les_poly]
+    les_y_fct6 = [chrono(trouve_inclusions6, read_instance(poly)) for poly in les_poly]
+    plt.plot(nb_poly, les_y_fct2, c='g', label='Fonction trouve_inclusions2')
+    plt.plot(nb_poly, les_y_fct3, c='b', label='Fonction trouve_inclusions3')
+    plt.plot(nb_poly, les_y_fct4, c='r', label='Fonction trouve_inclusions4')
+    plt.plot(nb_poly, les_y_fct5, c='m', label='Fonction trouve_inclusions5')
+    plt.plot(nb_poly, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
+    plt.xlabel("Nombre de polygones")
+    plt.ylabel("Temps d'exécution de la fonction (s)")
+    plt.legend()
+    plt.title('Temps en fonction du nombre de polygones')
+    plt.savefig("Performance7.png")
+
+
 def main():
     """
     charge chaque fichier .poly donne
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    tracage_courbe2()
+    tracage_courbe7()
 
 
 if __name__ == "__main__":
