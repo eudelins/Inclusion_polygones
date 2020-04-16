@@ -359,8 +359,9 @@ def main():
     affiche l'arbre en format texte
     """
     for fichier in sys.argv[1:]:
-        polygones = read_instance(fichier)
-        inclusion = trouve_inclusions4(polygones)
+        # polygones = read_instance(fichier)
+        polygones = vecteur_polygone(fichier)
+        inclusion = trouve_inclusions(polygones)
         print(inclusion)
 
 

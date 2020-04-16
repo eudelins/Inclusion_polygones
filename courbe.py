@@ -222,13 +222,36 @@ def tracage_courbe7():
     plt.savefig("Performance7.png")
 
 
+def tracage_courbe8():
+    """Trace  une courbe de performance en temps en fonction du nombre de
+    polygones utilisés."""
+    les_x = [4, 5, 6, 7]
+    les_poly = ["tests/polygons/sierp-" + str(i) + ".poly" for i in les_x]
+    les_y_fct2 = [chrono(trouve_inclusions2, vecteur_polygone(poly)) for poly in les_poly]
+    les_y_fct3 = [chrono(trouve_inclusions3, vecteur_polygone(poly)) for poly in les_poly]
+    les_y_fct4 = [chrono(trouve_inclusions4, read_instance(poly)) for poly in les_poly]
+    les_y_fct5 = [chrono(trouve_inclusions5, read_instance(poly)) for poly in les_poly]
+    les_y_fct6 = [chrono(trouve_inclusions6, read_instance(poly)) for poly in les_poly]
+    plt.plot(les_x, les_y_fct2, c='g', label='Fonction trouve_inclusions2')
+    plt.plot(les_x, les_y_fct3, c='b', label='Fonction trouve_inclusions3')
+    plt.plot(les_x, les_y_fct4, c='r', label='Fonction trouve_inclusions4')
+    plt.plot(les_x, les_y_fct5, c='m', label='Fonction trouve_inclusions5')
+    plt.plot(les_x, les_y_fct6, c='c', label='Fonction trouve_inclusions6')
+    plt.xlabel("Niveau de récursion")
+    plt.ylabel("Temps d'exécution de la fonction (s)")
+    plt.legend()
+    plt.title('Temps en fonction du niveau de récursion')
+    plt.savefig("Performance8.png")
+
+
+
 def main():
     """
     charge chaque fichier .poly donne
     trouve les inclusions
     affiche l'arbre en format texte
     """
-    tracage_courbe7()
+    tracage_courbe8()
 
 
 if __name__ == "__main__":
