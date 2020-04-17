@@ -361,7 +361,7 @@ def main():
     for fichier in sys.argv[1:]:
         # polygones = read_instance(fichier)
         polygones = vecteur_polygone(fichier)
-        inclusion = trouve_inclusions(polygones)
+        inclusion = trouve_inclusions4(polygones)
         print(inclusion)
 
 
